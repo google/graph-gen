@@ -1,3 +1,5 @@
+This is not an official Google Product. 
+
 Code for NVP model over Graphs. Only Preliminary results yet. Thanks Yujia Li for providing the code for parsing data files.
 
 Requirements:\
