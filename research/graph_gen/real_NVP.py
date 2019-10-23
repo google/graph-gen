@@ -28,6 +28,47 @@ flags = tf.app.flags
 
 FLAGS = flags.FLAGS
 
+
+def _masked_moments(x, axes, mask, shift=None, name=None, keep_dims=False):
+  """Calculate the mean and variance of x, but masked by the mask.
+
+  Aggregate the contents of x but mask while computing mean and variance to
+  keep track of spurious dimensions.
+
+  Args:
+    x: A Tensor.
+    axes: Array of ints, along which to compute mean and variance.
+    mask: Which entries to mask while computing moments.
+    shift: Not used, but kept for clarity as in `tf.nn.moments.`
+    name: Name used to scope operations that compute the moments.
+    keep_dims: Whether to produce moments with same dimensionality as the
+      input.
+
+  Returns:
+    Two tensors: mean and variance.
+  """
+  with tf.name_scope('masked moments', 'masked_moments', [x, axes, mask]):
+    y = tf.cast(x, tf.float32)
+    # Assumed that mask is 1 dimension less than the input x, and that the
+    # sum(mask) gives the overall number of entries in the wehole tensor
+    # which are relevant.
+    mask_broadcast = tf.expand_dims(mask, -1)
+    y = y * mask_broadcast
+    mean = tf.reduce_sum(y, axes, keepdims=True, name='sum')
+    mean = mean * 1.0 / (tf.reduce_sum(mask, axes))
+    # now compute the variance
+    variance = tf.reduce_sum(
+        mask_broadcast * tf.squared_difference(y, tf.stop_gradient(mean)),
+        axes,
+        keepdims=True,
+        name='variance')
+    variance = variance * 1.0 / (tf.reduce_sum(mask, axes))
+    if not keep_dims:
+      mean = tf.squeeze(mean, axes)
+      variance = tf.squeeze(variance, axes)
+    return (mean, variance)
+
+
 def mlp(inputs,
         layer_sizes,
         activation_fn=tf.nn.relu,
@@ -978,5 +1019,4 @@ def real_nvp_sample_fn(real_nvp_model, z_in, omega_in, input_dist_fn, **kwargs):
                                 summarize=100,
                                 message='Log Priors')
   return log_posterior_prob, out, edge_feat
-
 

@@ -39,7 +39,7 @@ flags.DEFINE_integer('eval_every', 100,
 flags.DEFINE_string('exp_dir', './citation_net_rev_mpnn/',
                     'Directory where to store results and checkpoints')
 flags.DEFINE_bool('clip_gradients', False, 'Whether to clip gradients or not')
-flags.DEFINE_string('data_dir', '/cns/vz-d/home/aviralkumar/citation_data',
+flags.DEFINE_string('data_dir', '',
                     'Data directory for the dataset')
 flags.DEFINE_string('dataset', 'max20', 'Dataset to tesst the model on.')
 flags.DEFINE_bool('add_weight_decay', True, 'Whether to add weight decay')
