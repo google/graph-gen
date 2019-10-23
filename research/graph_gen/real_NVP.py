@@ -979,4 +979,3 @@ def real_nvp_sample_fn(real_nvp_model, z_in, omega_in, input_dist_fn, **kwargs):
                                 message='Log Priors')
   return log_posterior_prob, out, edge_feat
 
-
